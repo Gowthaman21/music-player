@@ -1,0 +1,24 @@
+[
+    {
+        "key": "a",
+        "title": "Lose Yourself",
+        "artist": "Eminem",
+        "album":"The Marshall Mathers LP2",
+        "duration":200,
+        "albumArtUrl":
+            "https://t2.genius.com/unsafe/220x220/https%3A%2F%2Fimages.genius.com%2F058e2359838c93395c36119b48a2eff6.1000x1000x1.png",
+        "audioUrl":
+            "https://ia800204.us.archive.org/11/items/hamlet_0911_librivox/hamlet_act1_shakespeare.mp3"
+    },
+    {
+        "key": "b",
+        "title": "Stressed Out",
+        "artist": "Twenty One Pilots",
+        "album":"The Eminem Show",
+        "duration":150,
+        "albumArtUrl":
+            "https://cdn-images-1.medium.com/max/1344/1*fF0VVD5cCRam10rYvDeTOw.jpeg",
+        "audioUrl":
+            "https://ia600204.us.archive.org/11/items/hamlet_0911_librivox/hamlet_act5_shakespeare.mp3"
+    }
+]
