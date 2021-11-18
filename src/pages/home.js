@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import Library from "./library";
 import { NativeBaseProvider } from "native-base";
 import { getPermission } from "../api/GetPermission";
+import { Audio } from "expo-av";
 
 const Home = () => {
     const [details, setDetails] = useState([]);
+    const playbackObject = new Audio.Sound();
+    
     useEffect(() => {
         getFiles();
     }, []);
@@ -17,7 +20,9 @@ const Home = () => {
 
     return (
         <NativeBaseProvider>
-            <Library data={details} />
+            <Library
+                data={details}
+            />
         </NativeBaseProvider>
     );
 };

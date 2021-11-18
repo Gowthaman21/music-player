@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FlatList } from "react-native";
 import {
     NativeBaseProvider,
@@ -11,6 +11,7 @@ import {
 import Footer from "./play";
 import SwipeUpDown from "react-native-swipe-up-down";
 import Player from "./player";
+import { AudioContext } from "../context/AudioProvider";
 
 function Options(props) {
     return (
@@ -53,12 +54,13 @@ function Menu({ show, setShow }) {
 export default function Library({ data }) {
     const [showModal, setShowModal] = useState({ show: false, key: "" });
     const [songQueued, setSongQueued] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
     const [key, setKey] = useState("");
 
-    useEffect(() => {
-        console.log("keywss", data[0]?.duration);
-    }, [key]);
+    const context = useContext(AudioContext);
+
+    // useEffect(() => {
+    //     console.log("keywss", data[0]?.duration);
+    // }, [key]);
 
     return (
         <NativeBaseProvider>
@@ -68,15 +70,16 @@ export default function Library({ data }) {
                 </Text>
                 <Menu show={showModal} setShow={setShowModal} />
                 <FlatList
-                    data={data}
+                    data={context.audioFiles}
                     renderItem={({ item }) => (
                         <Pressable
                             onLongPress={() => {
                                 setShowModal({ show: true, key: item.key });
                             }}
                             onPress={() => {
-                                setKey(item.key);
-                                setSongQueued(true);
+                                context.selectAudio(item.key);
+                                // setKey(item.key);
+                                // setSongQueued(true);
                             }}
                         >
                             <Box
@@ -92,8 +95,9 @@ export default function Library({ data }) {
                                     source={{
                                         uri: item.albumArtUrl,
                                     }}
-                                    alt="Alternate Text"
+                                    alt="Image"
                                     size={50}
+                                    fallbackSource="https://st.depositphotos.com/3538103/5169/i/950/depositphotos_51692599-stock-photo-music-icon-design.jpg"
                                 />
                                 <Box px="5">
                                     <Text fontSize={"lg"} bold>
@@ -106,25 +110,11 @@ export default function Library({ data }) {
                     )}
                 />
 
-                {key && (
+                {context.currentAudioIndex && (
                     <SwipeUpDown
-                        itemMini={
-                            <Footer
-                                isPlaying={isPlaying}
-                                setIsPlaying={setIsPlaying}
-                                id={key}
-                                setKey={setKey}
-                                data={data}
-                            />
-                        }
+                        itemMini={<Footer />}
                         itemFull={
-                            <Player
-                                isPlaying={isPlaying}
-                                setIsPlaying={setIsPlaying}
-                                id={key}
-                                setKey={setKey}
-                                data={data}
-                            />
+                            <Player id={key} setKey={setKey} data={data} />
                         } // Pass props component when show full
                         // onShowMini={() => console.log("mini")}
                         // onShowFull={() => console.log("full")}
