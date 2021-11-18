@@ -1,40 +1,67 @@
-import React, { useState, useEffect } from "react";
-import {
-    NativeBaseProvider,
-    Box,
-    Image,
-    Text,
-    Slider,
-    Flex,
-    View,
-} from "native-base";
+import React, { useState, useEffect, useContext } from "react";
+import { NativeBaseProvider, Box, Image, Text, Flex, View } from "native-base";
+import Slider from "@react-native-community/slider";
 import { Entypo } from "@expo/vector-icons";
 import { TouchableWithoutFeedback } from "react-native";
+import { AudioContext } from "../context/AudioProvider";
 
-export default function Player({ isPlaying, setIsPlaying, id, setKey, data }) {
-    let det;
-    const [song, setSong] = useState({});
+export default function Player() {
+    const [currentPosition, setCurrentPosition] = useState(0);
+    const context = useContext(AudioContext);
 
-    function nextSong() {
-        let i = data.indexOf(song);
-        if (i < data.length - 1) {
-            setKey(data[i + 1].key);
-            setSong(data[i + 1]);
+    const { playbackPosition, playbackDuration, currentAudio } = context;
+    const calculateSeekBar = () => {
+        if (playbackPosition !== null && playbackDuration !== null) {
+            return playbackPosition / playbackDuration;
         }
-    }
-    function prevSong() {
-        let i = data.indexOf(song);
-        if (i !== 0) {
-            setKey(data[1 - 1].key);
-            setSong(data[i - 1]);
-        }
-    }
 
-    useEffect(() => {
-        det = data.find((i) => i.key === id);
-        setKey(det.key);
-        setSong(det);
-    }, [id]);
+        if (currentAudio.lastPosition) {
+            return currentAudio.lastPosition / (currentAudio.duration * 1000);
+        }
+
+        return 0;
+    };
+
+    async function nextSong() {
+        await context.changeAudio("next");
+    }
+    async function prevSong() {
+        await context.changeAudio("prev");
+    }
+    const convertTime = (minutes) => {
+        if (minutes) {
+            const hrs = minutes / 60;
+            const minute = hrs.toString().split(".")[0];
+            const percent = parseInt(hrs.toString().split(".")[1].slice(0, 2));
+            const sec = Math.ceil((60 * percent) / 100);
+            if (parseInt(minute) < 10 && sec < 10) {
+                return `0${minute}:0${sec}`;
+            }
+
+            if (sec == 60) {
+                return `${minute + 1}:00`;
+            }
+
+            if (parseInt(minute) < 10) {
+                return `0${minute}:${sec}`;
+            }
+
+            if (sec < 10) {
+                return `${minute}:0${sec}`;
+            }
+
+            return `${minute}:${sec}`;
+        }
+    };
+
+    const renderCurrentTime = () => {
+        if (!context.soundObj && currentAudio.lastPosition) {
+            return convertTime(currentAudio.lastPosition / 1000);
+        }
+        return convertTime(context.playbackPosition / 1000);
+    };
+
+    useEffect(() => {}, [context.currentAudio]);
 
     return (
         <NativeBaseProvider>
@@ -55,36 +82,67 @@ export default function Player({ isPlaying, setIsPlaying, id, setKey, data }) {
                 width="full"
             >
                 <Text fontSize="lg" mt={9}>
-                    {song.album}
+                    {context.currentAudio.album}
                 </Text>
 
                 <Image
                     key={Date.now()}
                     source={{
-                        uri: song.albumArtUrl,
+                        uri: context.currentAudio.albumArtUrl,
                     }}
                     alt="Alternate Text"
                     size="300"
                     mt={4}
                 />
                 <Text fontSize="2xl" mt={5}>
-                    {song?.title}
+                    {context.currentAudio?.title}
                 </Text>
                 <Text fontSize="md" mt={-1}>
-                    {song?.artist}
+                    {context.currentAudio?.artist}
                 </Text>
                 <Box flexDirection="row" w="full" justifyContent="center">
-                    <Text fontSize="sm" pt={5} mr={3}>
-                        0:00
+                    <Text fontSize="sm" pt={3}>
+                        {currentPosition
+                            ? currentPosition
+                            : renderCurrentTime()}
                     </Text>
-                    <Slider defaultValue={0} size="sm" mt={5} w="75%">
-                        <Slider.Track bg="grey">
-                            <Slider.FilledTrack bg="black" />
-                        </Slider.Track>
-                        <Slider.Thumb bg="grey" />
-                    </Slider>
-                    <Text fontSize="sm" pt={5} ml={3}>
-                        {song?.duration}
+                    <Slider
+                        style={{
+                            width: "75%",
+                            height: 40,
+                        }}
+                        minimumValue={0}
+                        maximumValue={1}
+                        value={calculateSeekBar()}
+                        thumbTintColor="#ffff00"
+                        minimumTrackTintColor="#00ff00"
+                        maximumTrackTintColor="#ff4500"
+                        onValueChange={(value) => {
+                            setCurrentPosition(
+                                convertTime(
+                                    value * context.currentAudio.duration
+                                )
+                            );
+                        }}
+                        onSlidingStart={async () => {
+                            if (!context.isPlaying) return;
+
+                            try {
+                                await context.pause();
+                            } catch (error) {
+                                console.log(
+                                    "error inside onSlidingStart callback",
+                                    error
+                                );
+                            }
+                        }}
+                        onSlidingComplete={async (value) => {
+                            await context.moveAudio(value);
+                            setCurrentPosition(0);
+                        }}
+                    />
+                    <Text fontSize="sm" pt={3}>
+                        {context.currentAudio?.duration}
                     </Text>
                 </Box>
 
@@ -104,10 +162,10 @@ export default function Player({ isPlaying, setIsPlaying, id, setKey, data }) {
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback
                             onPress={() => {
-                                setIsPlaying(!isPlaying);
+                                context.selectAudio(context.currentAudioIndex);
                             }}
                         >
-                            {isPlaying ? (
+                            {context.isPlaying ? (
                                 <Entypo
                                     name="controller-paus"
                                     size={42}
@@ -132,6 +190,11 @@ export default function Player({ isPlaying, setIsPlaying, id, setKey, data }) {
                         </TouchableWithoutFeedback>
                     </Flex>
                 </View>
+                {/* <View>
+                    <Text fontSize="xs">Up Next</Text>
+                    <Text fontSize="md">{upNext.title}</Text>
+                    <Text fontSize="xs">{upNext.artist}</Text>
+                </View> */}
             </Box>
         </NativeBaseProvider>
     );

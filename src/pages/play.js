@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Image, Box, NativeBaseProvider } from "native-base";
 import { Entypo } from "@expo/vector-icons";
 import { TouchableWithoutFeedback } from "react-native";
 import MarqueeText from "react-native-marquee";
+import { AudioContext } from "../context/AudioProvider";
 
 function Text(props) {
     return (
@@ -18,30 +19,17 @@ function Text(props) {
     );
 }
 
-export default function Footer({ isPlaying, setIsPlaying, id, setKey, data }) {
-    let det;
-    const [song, setSong] = useState({});
+export default function Footer() {
+    const context = useContext(AudioContext);
 
-    function nextSong() {
-        let i = data.indexOf(song);
-        if (i < data.length - 1) {
-            setKey(data[i + 1].key);
-            setSong(data[i + 1]);
-        }
+    async function nextSong() {
+        await context.changeAudio("next");
     }
-    function prevSong() {
-        let i = data.indexOf(song);
-        if (i !== 0) {
-            setKey(data[1 - 1].key);
-            setSong(data[i - 1]);
-        }
+    async function prevSong() {
+        await context.changeAudio("prev");
     }
 
-    useEffect(() => {
-        det = data.find((i) => i.key === id);
-        setKey(det.key);
-        setSong(det);
-    }, [id]);
+    useEffect(() => {}, [context.currentAudio]);
 
     return (
         <NativeBaseProvider>
@@ -49,15 +37,16 @@ export default function Footer({ isPlaying, setIsPlaying, id, setKey, data }) {
                 <Image
                     key={Date.now()}
                     source={{
-                        uri: song?.albumArtUrl,
+                        uri: context.currentAudio?.albumArtUrl,
                     }}
                     alt="Alternate Text"
                     size="50"
                     m={2}
+                    fallbackSource="https://st.depositphotos.com/3538103/5169/i/950/depositphotos_51692599-stock-photo-music-icon-design.jpg"
                 />
                 <Box w={150}>
-                    <Text>{song?.title}</Text>
-                    <Text>{song?.album}</Text>
+                    <Text>{context.currentAudio?.title}</Text>
+                    <Text>{context.currentAudio?.album}</Text>
                 </Box>
                 <TouchableWithoutFeedback onPress={prevSong}>
                     <Entypo
@@ -68,10 +57,11 @@ export default function Footer({ isPlaying, setIsPlaying, id, setKey, data }) {
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback
                     onPress={() => {
-                        setIsPlaying(!isPlaying);
+                        // context.toggleisPlaying();
+                        context.selectAudio(context.currentAudioIndex);
                     }}
                 >
-                    {isPlaying ? (
+                    {context.isPlaying ? (
                         <Entypo
                             name="controller-paus"
                             size={42}
