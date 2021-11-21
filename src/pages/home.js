@@ -5,24 +5,9 @@ import { getPermission } from "../api/GetPermission";
 import { Audio } from "expo-av";
 
 const Home = () => {
-    const [details, setDetails] = useState([]);
-    const playbackObject = new Audio.Sound();
-    
-    useEffect(() => {
-        getFiles();
-    }, []);
-
-    const getFiles = async () => {
-        setDetails(await getPermission());
-    };
-
-    useEffect(() => {}, [details]);
-
     return (
         <NativeBaseProvider>
-            <Library
-                data={details}
-            />
+            <Library />
         </NativeBaseProvider>
     );
 };
