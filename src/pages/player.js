@@ -9,24 +9,30 @@ export default function Player() {
     const [currentPosition, setCurrentPosition] = useState(0);
     const context = useContext(AudioContext);
 
-    const { playbackPosition, playbackDuration, currentAudio } = context;
+    const { details, changeAudio, pause, moveAudio, selectAudio } = context;
     const calculateSeekBar = () => {
-        if (playbackPosition !== null && playbackDuration !== null) {
-            return playbackPosition / playbackDuration;
+        if (
+            details.playbackPosition !== null &&
+            details.playbackDuration !== null
+        ) {
+            return details.playbackPosition / details.playbackDuration;
         }
 
-        if (currentAudio.lastPosition) {
-            return currentAudio.lastPosition / (currentAudio.duration * 1000);
+        if (details.currentAudio.lastPosition) {
+            return (
+                details.currentAudio.lastPosition /
+                (details.currentAudio.duration * 1000)
+            );
         }
 
         return 0;
     };
 
     async function nextSong() {
-        await context.changeAudio("next");
+        await changeAudio("next");
     }
     async function prevSong() {
-        await context.changeAudio("prev");
+        await changeAudio("prev");
     }
     const convertTime = (minutes) => {
         if (minutes) {
@@ -55,17 +61,17 @@ export default function Player() {
     };
 
     const renderCurrentTime = () => {
-        if (!context.soundObj && currentAudio.lastPosition) {
-            return convertTime(currentAudio.lastPosition / 1000);
+        if (!details.soundObj && details.currentAudio.lastPosition) {
+            return convertTime(details.currentAudio.lastPosition / 1000);
         }
-        return convertTime(context.playbackPosition / 1000);
+        return convertTime(details.playbackPosition / 1000);
     };
 
-    useEffect(() => {}, [context.currentAudio]);
+    useEffect(() => {}, [details.currentAudio]);
 
     return (
         <NativeBaseProvider>
-            <Box p="1" safeArea flexDirection="row-reverse">
+            {/* <Box p="1" safeArea flexDirection="row-reverse">
                 <TouchableWithoutFeedback
                     onPress={() => {
                         navigation.push("timer");
@@ -73,7 +79,7 @@ export default function Player() {
                 >
                     <Entypo name="stopwatch" size={24} color="black" />
                 </TouchableWithoutFeedback>
-            </Box>
+            </Box> */}
 
             <Box
                 flex={1}
@@ -82,23 +88,23 @@ export default function Player() {
                 width="full"
             >
                 <Text fontSize="lg" mt={9}>
-                    {context.currentAudio.album}
+                    {details.currentAudio.album}
                 </Text>
 
                 <Image
                     key={Date.now()}
                     source={{
-                        uri: context.currentAudio.albumArtUrl,
+                        uri: details.currentAudio.albumArtUrl,
                     }}
                     alt="Alternate Text"
                     size="300"
                     mt={4}
                 />
                 <Text fontSize="2xl" mt={5}>
-                    {context.currentAudio?.title}
+                    {details.currentAudio?.title}
                 </Text>
                 <Text fontSize="md" mt={-1}>
-                    {context.currentAudio?.artist}
+                    {details.currentAudio?.artist}
                 </Text>
                 <Box flexDirection="row" w="full" justifyContent="center">
                     <Text fontSize="sm" pt={3}>
@@ -120,15 +126,15 @@ export default function Player() {
                         onValueChange={(value) => {
                             setCurrentPosition(
                                 convertTime(
-                                    value * context.currentAudio.duration
+                                    value * details.currentAudio.duration
                                 )
                             );
                         }}
                         onSlidingStart={async () => {
-                            if (!context.isPlaying) return;
+                            if (!details.isPlaying) return;
 
                             try {
-                                await context.pause();
+                                await pause();
                             } catch (error) {
                                 console.log(
                                     "error inside onSlidingStart callback",
@@ -137,12 +143,12 @@ export default function Player() {
                             }
                         }}
                         onSlidingComplete={async (value) => {
-                            await context.moveAudio(value);
+                            await moveAudio(value);
                             setCurrentPosition(0);
                         }}
                     />
                     <Text fontSize="sm" pt={3}>
-                        {context.currentAudio?.duration}
+                        {details.currentAudio?.duration}
                     </Text>
                 </Box>
 
@@ -162,10 +168,10 @@ export default function Player() {
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback
                             onPress={() => {
-                                context.selectAudio(context.currentAudioIndex);
+                                selectAudio(details.currentAudioIndex);
                             }}
                         >
-                            {context.isPlaying ? (
+                            {details.isPlaying ? (
                                 <Entypo
                                     name="controller-paus"
                                     size={42}

@@ -22,14 +22,16 @@ function Text(props) {
 export default function Footer() {
     const context = useContext(AudioContext);
 
+    const { changeAudio, details, selectAudio } = context;
+
     async function nextSong() {
-        await context.changeAudio("next");
+        await changeAudio("next");
     }
     async function prevSong() {
-        await context.changeAudio("prev");
+        await changeAudio("prev");
     }
 
-    useEffect(() => {}, [context.currentAudio]);
+    useEffect(() => {}, [details.currentAudio]);
 
     return (
         <NativeBaseProvider>
@@ -37,7 +39,7 @@ export default function Footer() {
                 <Image
                     key={Date.now()}
                     source={{
-                        uri: context.currentAudio?.albumArtUrl,
+                        uri: details.currentAudio?.albumArtUrl,
                     }}
                     alt="Alternate Text"
                     size="50"
@@ -45,8 +47,8 @@ export default function Footer() {
                     fallbackSource="https://st.depositphotos.com/3538103/5169/i/950/depositphotos_51692599-stock-photo-music-icon-design.jpg"
                 />
                 <Box w={150}>
-                    <Text>{context.currentAudio?.title}</Text>
-                    <Text>{context.currentAudio?.album}</Text>
+                    <Text>{details.currentAudio?.title}</Text>
+                    <Text>{details.currentAudio?.album}</Text>
                 </Box>
                 <TouchableWithoutFeedback onPress={prevSong}>
                     <Entypo
@@ -57,11 +59,10 @@ export default function Footer() {
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback
                     onPress={() => {
-                        // context.toggleisPlaying();
-                        context.selectAudio(context.currentAudioIndex);
+                        selectAudio(details.currentAudioIndex);
                     }}
                 >
-                    {context.isPlaying ? (
+                    {details.isPlaying ? (
                         <Entypo
                             name="controller-paus"
                             size={42}

@@ -53,8 +53,6 @@ function Menu({ show, setShow }) {
 
 export default function Library({ data }) {
     const [showModal, setShowModal] = useState({ show: false, key: "" });
-    const [songQueued, setSongQueued] = useState(false);
-    const [key, setKey] = useState("");
 
     const context = useContext(AudioContext);
 
@@ -70,13 +68,15 @@ export default function Library({ data }) {
                 </Text>
                 <Menu show={showModal} setShow={setShowModal} />
                 <FlatList
-                    data={context.audioFiles}
+                    data={context.details.audioFiles}
                     renderItem={({ item }) => (
                         <Pressable
                             onLongPress={() => {
                                 setShowModal({ show: true, key: item.key });
                             }}
                             onPress={() => {
+                                console.log("item", item.title);
+
                                 context.selectAudio(item.key);
                                 // setKey(item.key);
                                 // setSongQueued(true);
@@ -110,12 +110,10 @@ export default function Library({ data }) {
                     )}
                 />
 
-                {context.currentAudioIndex && (
+                {context.details.currentAudioIndex && (
                     <SwipeUpDown
                         itemMini={<Footer />}
-                        itemFull={
-                            <Player id={key} setKey={setKey} data={data} />
-                        } // Pass props component when show full
+                        itemFull={<Player />} // Pass props component when show full
                         // onShowMini={() => console.log("mini")}
                         // onShowFull={() => console.log("full")}
                         // onMoveDown={() => console.log("down")}
