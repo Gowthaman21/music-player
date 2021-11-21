@@ -60,17 +60,6 @@ export const getPermission = async () => {
         let final = [];
         for (var i = 0; i < dum2.length; i++) {
             let d2 = dum2[i]; //make default values
-            if (d2 === null) {
-                d2 = {
-                    title: d1.filename,
-                    album: "unknown album",
-                    artist: "unknown",
-                    picture: {
-                        pictureData:
-                            "https://st.depositphotos.com/3538103/5169/i/950/depositphotos_51692599-stock-photo-music-icon-design.jpg",
-                    },
-                };
-            }
             if (!d2.title) {
                 d2.title = d2.filename;
             }
