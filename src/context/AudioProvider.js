@@ -21,7 +21,7 @@ const AudioProvider = ({ children }) => {
         totalAudioCount: 0,
     });
 
-    const handleChange = (newState) => {
+    const handleChange = async (newState) => {
         setDetails((prevState) => ({
             ...prevState,
             ...newState,
@@ -32,6 +32,7 @@ const AudioProvider = ({ children }) => {
     }, []);
 
     const onPlaybackStatusUpdate = async (playbackStatus) => {
+        // console.log("currentIndex", playbackStatus.uri);
         if (playbackStatus.isLoaded && playbackStatus.isPlaying) {
             handleChange({
                 playbackPosition: playbackStatus.positionMillis,
@@ -39,6 +40,9 @@ const AudioProvider = ({ children }) => {
             });
             // setplaybackPosition(playbackStatus.positionMillis);
             // setplaybackDuration(playbackStatus.durationMillis);
+        }
+        if (playbackStatus.didJustFinish) {
+            handleChange({ isPlaying: false });
         }
     };
 
@@ -112,7 +116,7 @@ const AudioProvider = ({ children }) => {
                 // setcurrentAudioIndex(det.key);
                 // setsoundObj(status);
                 // setisPlaying(true);
-                handleChange({
+                await handleChange({
                     currentAudio: det,
                     currentAudioIndex: det.key,
                     soundObj: status,
