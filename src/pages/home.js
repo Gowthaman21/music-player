@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Library from "./library";
 import { NativeBaseProvider } from "native-base";
-import { getPermission } from "../api/GetPermission";
-import { Audio } from "expo-av";
+import Player from "./player";
 
 const Home = () => {
+    const [player, setPlayer] = useState(false);
     return (
         <NativeBaseProvider>
-            <Library />
+            {!player ? (
+                <Library player={player} setPlayer={setPlayer} />
+            ) : (
+                <Player player={player} setPlayer={setPlayer} />
+            )}
         </NativeBaseProvider>
     );
 };

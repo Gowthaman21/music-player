@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { FlatList } from "react-native";
+import { FlatList, Dimensions } from "react-native";
 import {
     NativeBaseProvider,
     Image,
@@ -7,11 +7,18 @@ import {
     Box,
     Pressable,
     Modal,
+    HStack,
 } from "native-base";
 import Footer from "./play";
 import SwipeUpDown from "react-native-swipe-up-down";
-import Player from "./player";
+// import Player from "./player";
 import { AudioContext } from "../context/AudioProvider";
+import GestureRecognizer, {
+    swipeDirections,
+} from "react-native-swipe-gestures";
+
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
 function Options(props) {
     return (
@@ -51,10 +58,21 @@ function Menu({ show, setShow }) {
     );
 }
 
-export default function Library({ data }) {
+export default function Library({ player, setPlayer }) {
     const [showModal, setShowModal] = useState({ show: false, key: "" });
+    // const [state, setstate] = useState(initialState)
 
     const context = useContext(AudioContext);
+
+    const onSwipeUp = (gestureState) => {
+        console.log("swiped");
+        setPlayer(true);
+        // this.setState({myText: 'You swiped up!'});
+    };
+    const config = {
+        velocityThreshold: 0.3,
+        directionalOffsetThreshold: 80,
+    };
 
     // useEffect(() => {
     //     console.log("keywss", data[0]?.duration);
@@ -62,7 +80,7 @@ export default function Library({ data }) {
 
     return (
         <NativeBaseProvider>
-            <Box flex={1} safeArea bgColor="white">
+            <Box flex={1} safeArea bgColor="#4f4f4f">
                 <Text fontSize="3xl" mx={3} bold>
                     Library
                 </Text>
@@ -85,7 +103,7 @@ export default function Library({ data }) {
                             <Box
                                 p="2"
                                 mb="1"
-                                w="350"
+                                w={windowWidth}
                                 flexDirection="row"
                                 border={2}
                                 borderColor="red.300"
@@ -109,22 +127,15 @@ export default function Library({ data }) {
                         </Pressable>
                     )}
                 />
-
                 {context.details.currentAudioIndex && (
-                    <SwipeUpDown
-                        itemMini={<Footer />}
-                        itemFull={<Player />} // Pass props component when show full
-                        // onShowMini={() => console.log("mini")}
-                        // onShowFull={() => console.log("full")}
-                        // onMoveDown={() => console.log("down")}
-                        // onMoveUp={() => console.log("up")}
-                        disablePressToShow={false} // Press item mini to show full
-                        // animation="spring"
-                        style={{
-                            backgroundColor: "white",
-                            padding: 0,
-                        }}
-                    />
+                    <GestureRecognizer
+                        onSwipeUp={(state) => onSwipeUp(state)}
+                        config={config}
+                    >
+                        <HStack>
+                            <Footer />
+                        </HStack>
+                    </GestureRecognizer>
                 )}
             </Box>
         </NativeBaseProvider>

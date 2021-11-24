@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Image, Box, NativeBaseProvider } from "native-base";
 import { Entypo } from "@expo/vector-icons";
-import { TouchableWithoutFeedback } from "react-native";
+import { TouchableWithoutFeedback, Dimensions } from "react-native";
 import MarqueeText from "react-native-marquee";
 import { AudioContext } from "../context/AudioProvider";
 
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 function Text(props) {
     return (
         <MarqueeText
@@ -46,7 +48,7 @@ export default function Footer() {
                     m={2}
                     fallbackSource="https://st.depositphotos.com/3538103/5169/i/950/depositphotos_51692599-stock-photo-music-icon-design.jpg"
                 />
-                <Box w={150}>
+                <Box w={windowWidth / 2.2}>
                     <Text>{details.currentAudio?.title}</Text>
                     <Text>{details.currentAudio?.album}</Text>
                 </Box>

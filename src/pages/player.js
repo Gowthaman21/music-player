@@ -2,20 +2,39 @@ import React, { useState, useEffect, useContext } from "react";
 import { NativeBaseProvider, Box, Image, Text, Flex, View } from "native-base";
 import Slider from "@react-native-community/slider";
 import { Entypo } from "@expo/vector-icons";
-import { TouchableWithoutFeedback } from "react-native";
+import { TouchableWithoutFeedback, Dimensions } from "react-native";
 import { AudioContext } from "../context/AudioProvider";
+import GestureRecognizer, {
+    swipeDirections,
+} from "react-native-swipe-gestures";
 
-export default function Player() {
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
+
+export default function Player({ player, setPlayer }) {
     const [currentPosition, setCurrentPosition] = useState(0);
     const context = useContext(AudioContext);
 
     const { details, changeAudio, pause, moveAudio, selectAudio } = context;
+
+    const config = {
+        velocityThreshold: 0.3,
+        directionalOffsetThreshold: 80,
+    };
+
+    const onSwipeDown = (gestureState) => {
+        console.log("swiped down");
+        setPlayer(false);
+        // this.setState({myText: 'You swiped up!'});
+    };
+
     const calculateSeekBar = () => {
         if (
             details.playbackPosition !== null &&
             details.playbackDuration !== null
         ) {
-            return details.playbackPosition / details.playbackDuration;
+            let pos = details.playbackPosition / details.playbackDuration;
+            return pos;
         }
 
         if (details.currentAudio.lastPosition) {
@@ -80,128 +99,138 @@ export default function Player() {
                     <Entypo name="stopwatch" size={24} color="black" />
                 </TouchableWithoutFeedback>
             </Box> */}
-
-            <Box
-                flex={1}
-                alignItems="center"
-                // justifyContent="center"
-                width="full"
+            <GestureRecognizer
+                onSwipeDown={(state) => onSwipeDown(state)}
+                config={config}
+                style={{
+                    flex: 1,
+                }}
             >
-                <Text fontSize="lg" mt={9}>
-                    {details.currentAudio.album}
-                </Text>
-
-                <Image
-                    key={Date.now()}
-                    source={{
-                        uri: details.currentAudio.albumArtUrl,
-                    }}
-                    alt="Alternate Text"
-                    size="300"
-                    mt={4}
-                />
-                <Text fontSize="2xl" mt={5}>
-                    {details.currentAudio?.title}
-                </Text>
-                <Text fontSize="md" mt={-1}>
-                    {details.currentAudio?.artist}
-                </Text>
-                <Box flexDirection="row" w="full" justifyContent="center">
-                    <Text fontSize="sm" pt={3}>
-                        {currentPosition
-                            ? currentPosition
-                            : renderCurrentTime()}
+                <Box
+                    safeArea
+                    bgColor="green.100"
+                    flex={1}
+                    alignItems="center"
+                    // justifyContent="center"
+                    width={windowWidth}
+                    height={windowHeight}
+                >
+                    <Text fontSize="lg" mt={9}>
+                        {details.currentAudio.album}
                     </Text>
-                    <Slider
-                        style={{
-                            width: "75%",
-                            height: 40,
-                        }}
-                        minimumValue={0}
-                        maximumValue={1}
-                        value={calculateSeekBar()}
-                        thumbTintColor="#ffff00"
-                        minimumTrackTintColor="#00ff00"
-                        maximumTrackTintColor="#ff4500"
-                        onValueChange={(value) => {
-                            setCurrentPosition(
-                                convertTime(
-                                    value * details.currentAudio.duration
-                                )
-                            );
-                        }}
-                        onSlidingStart={async () => {
-                            if (!details.isPlaying) return;
 
-                            try {
-                                await pause();
-                            } catch (error) {
-                                console.log(
-                                    "error inside onSlidingStart callback",
-                                    error
-                                );
-                            }
+                    <Image
+                        key={Date.now()}
+                        source={{
+                            uri: details.currentAudio.albumArtUrl,
                         }}
-                        onSlidingComplete={async (value) => {
-                            await moveAudio(value);
-                            setCurrentPosition(0);
-                        }}
+                        alt="Alternate Text"
+                        size="300"
+                        mt={4}
                     />
-                    <Text fontSize="sm" pt={3}>
-                        {details.currentAudio?.duration}
+                    <Text fontSize="2xl" mt={5}>
+                        {details.currentAudio?.title}
                     </Text>
-                </Box>
-
-                <View>
-                    <Flex
-                        direction={"row"}
-                        align={"center"}
-                        justifyContent="center"
-                        mt={5}
-                    >
-                        <TouchableWithoutFeedback onPress={prevSong}>
-                            <Entypo
-                                name="controller-jump-to-start"
-                                size={42}
-                                color="black"
-                            />
-                        </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback
-                            onPress={() => {
-                                selectAudio(details.currentAudioIndex);
+                    <Text fontSize="md" mt={-1}>
+                        {details.currentAudio?.artist}
+                    </Text>
+                    <Box flexDirection="row" w="full" justifyContent="center">
+                        <Text fontSize="sm" pt={3}>
+                            {currentPosition
+                                ? currentPosition
+                                : renderCurrentTime()}
+                        </Text>
+                        <Slider
+                            style={{
+                                width: "75%",
+                                height: 40,
                             }}
+                            minimumValue={0}
+                            maximumValue={1}
+                            value={calculateSeekBar()}
+                            thumbTintColor="#ffff00"
+                            minimumTrackTintColor="#00ff00"
+                            maximumTrackTintColor="#ff4500"
+                            onValueChange={(value) => {
+                                setCurrentPosition(
+                                    convertTime(
+                                        value * details.currentAudio.duration
+                                    )
+                                );
+                            }}
+                            onSlidingStart={async () => {
+                                if (!details.isPlaying) return;
+
+                                try {
+                                    await pause();
+                                } catch (error) {
+                                    console.log(
+                                        "error inside onSlidingStart callback",
+                                        error
+                                    );
+                                }
+                            }}
+                            onSlidingComplete={async (value) => {
+                                await moveAudio(value);
+                                setCurrentPosition(0);
+                            }}
+                        />
+                        <Text fontSize="sm" pt={3}>
+                            {details.currentAudio?.duration}
+                        </Text>
+                    </Box>
+
+                    <View>
+                        <Flex
+                            direction={"row"}
+                            align={"center"}
+                            justifyContent="center"
+                            mt={5}
                         >
-                            {details.isPlaying ? (
+                            <TouchableWithoutFeedback onPress={prevSong}>
                                 <Entypo
-                                    name="controller-paus"
+                                    name="controller-jump-to-start"
                                     size={42}
-                                    style={{ marginHorizontal: 40 }}
                                     color="black"
                                 />
-                            ) : (
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback
+                                onPress={() => {
+                                    selectAudio(details.currentAudioIndex);
+                                }}
+                            >
+                                {details.isPlaying ? (
+                                    <Entypo
+                                        name="controller-paus"
+                                        size={42}
+                                        style={{ marginHorizontal: 40 }}
+                                        color="black"
+                                    />
+                                ) : (
+                                    <Entypo
+                                        name="controller-play"
+                                        size={42}
+                                        style={{ marginHorizontal: 40 }}
+                                        color="black"
+                                    />
+                                )}
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={nextSong}>
                                 <Entypo
-                                    name="controller-play"
+                                    name="controller-next"
                                     size={42}
-                                    style={{ marginHorizontal: 40 }}
                                     color="black"
                                 />
-                            )}
-                        </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback onPress={nextSong}>
-                            <Entypo
-                                name="controller-next"
-                                size={42}
-                                color="black"
-                            />
-                        </TouchableWithoutFeedback>
-                    </Flex>
-                </View>
-                {/* <View>
+                            </TouchableWithoutFeedback>
+                        </Flex>
+                    </View>
+                    {/* <View>
                     <Text fontSize="xs">Up Next</Text>
                     <Text fontSize="md">{upNext.title}</Text>
                     <Text fontSize="xs">{upNext.artist}</Text>
                 </View> */}
-            </Box>
+                </Box>
+            </GestureRecognizer>
         </NativeBaseProvider>
     );
 }
