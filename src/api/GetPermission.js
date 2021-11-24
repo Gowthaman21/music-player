@@ -2,7 +2,7 @@ import * as MediaLibrary from "expo-media-library";
 import MusicInfo from "expo-music-info";
 
 const readProp = async (i) => {
-    let data = await MusicInfo.getMusicInfoAsync(i.url, {
+    let data = await MusicInfo.getMusicInfoAsync(i.uri, {
         title: true,
         artist: true,
         album: true,
@@ -52,11 +52,11 @@ export const getPermission = async () => {
         let dum = await getAudioFiles();
         let dum2 = [];
         const requests = dum.map(async (i) => dum2.push(await readProp(i)));
-        // await Promise.all(requests).then(() => {
-        //     dum2.map((i) => {
-        //         console.log("log", i.album);
-        //     });
-        // });
+        await Promise.all(requests).then(() => {
+            dum2.map((i) => {
+                // console.log("log", i.album);
+            });
+        });
         let final = [];
         for (var i = 0; i < dum2.length; i++) {
             let d2 = dum2[i]; //make default values
@@ -86,8 +86,6 @@ export const getPermission = async () => {
                 duration: fmtMSS(d2.duration),
                 albumArtUrl: d2?.picture?.pictureData,
             };
-            // console.log("temp", temp.artist);
-
             final.push(temp);
         }
 
