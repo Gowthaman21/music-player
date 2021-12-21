@@ -108,7 +108,6 @@ export default function Player({ player, setPlayer }) {
             >
                 <Box
                     safeArea
-                    bgColor="green.100"
                     flex={1}
                     alignItems="center"
                     // justifyContent="center"

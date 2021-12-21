@@ -10,7 +10,6 @@ import {
     HStack,
 } from "native-base";
 import Footer from "./play";
-import SwipeUpDown from "react-native-swipe-up-down";
 // import Player from "./player";
 import { AudioContext } from "../context/AudioProvider";
 import GestureRecognizer, {
@@ -23,12 +22,12 @@ const windowHeight = Dimensions.get("window").height;
 function Options(props) {
     return (
         <Box
-            bgColor="yellow.100"
+            // bgColor="yellow.100"
             w="full"
             px={2}
             py={1}
             border={2}
-            borderBottomColor="red.100"
+            borderBottomColor="#707070"
             borderBottomWidth={2}
             {...props}
         />
@@ -80,7 +79,7 @@ export default function Library({ player, setPlayer }) {
 
     return (
         <NativeBaseProvider>
-            <Box flex={1} safeArea bgColor="#4f4f4f">
+            <Box flex={1} safeArea bgColor="white">
                 <Text fontSize="3xl" mx={3} bold>
                     Library
                 </Text>
@@ -106,7 +105,7 @@ export default function Library({ player, setPlayer }) {
                                 w={windowWidth}
                                 flexDirection="row"
                                 border={2}
-                                borderColor="red.300"
+                                borderColor="#707070"
                                 borderBottomWidth={2}
                             >
                                 <Image
