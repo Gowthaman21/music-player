@@ -4,14 +4,20 @@ import Slider from "@react-native-community/slider";
 import { Entypo } from "@expo/vector-icons";
 import { TouchableWithoutFeedback, Dimensions } from "react-native";
 import { AudioContext } from "../context/AudioProvider";
-import GestureRecognizer, {
-    swipeDirections,
-} from "react-native-swipe-gestures";
+import GestureRecognizer from "react-native-swipe-gestures";
+import {
+    PRIMARY,
+    PRIMARY_VAR,
+    SECONDARY,
+    BACKGROUND,
+    BLACK,
+    WHITE,
+} from "../theme";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
-export default function Player({ player, setPlayer }) {
+export default function Player({ navigation }) {
     const [currentPosition, setCurrentPosition] = useState(0);
     const context = useContext(AudioContext);
 
@@ -24,7 +30,7 @@ export default function Player({ player, setPlayer }) {
 
     const onSwipeDown = (gestureState) => {
         console.log("swiped down");
-        setPlayer(false);
+        navigation.navigate("library");
         // this.setState({myText: 'You swiped up!'});
     };
 
@@ -90,15 +96,6 @@ export default function Player({ player, setPlayer }) {
 
     return (
         <NativeBaseProvider>
-            {/* <Box p="1" safeArea flexDirection="row-reverse">
-                <TouchableWithoutFeedback
-                    onPress={() => {
-                        navigation.push("timer");
-                    }}
-                >
-                    <Entypo name="stopwatch" size={24} color="black" />
-                </TouchableWithoutFeedback>
-            </Box> */}
             <GestureRecognizer
                 onSwipeDown={(state) => onSwipeDown(state)}
                 config={config}
@@ -110,11 +107,12 @@ export default function Player({ player, setPlayer }) {
                     safeArea
                     flex={1}
                     alignItems="center"
+                    bgColor={BLACK}
                     // justifyContent="center"
                     width={windowWidth}
                     height={windowHeight}
                 >
-                    <Text fontSize="lg" mt={9}>
+                    <Text fontSize="lg" mt={9} color={WHITE}>
                         {details.currentAudio.album}
                     </Text>
 
@@ -127,14 +125,14 @@ export default function Player({ player, setPlayer }) {
                         size="300"
                         mt={4}
                     />
-                    <Text fontSize="2xl" mt={5}>
+                    <Text fontSize="2xl" mt={5} color={WHITE}>
                         {details.currentAudio?.title}
                     </Text>
-                    <Text fontSize="md" mt={-1}>
+                    <Text fontSize="md" mt={-1} color={WHITE}>
                         {details.currentAudio?.artist}
                     </Text>
                     <Box flexDirection="row" w="full" justifyContent="center">
-                        <Text fontSize="sm" pt={3}>
+                        <Text fontSize="sm" pt={3} color={WHITE}>
                             {currentPosition
                                 ? currentPosition
                                 : renderCurrentTime()}
@@ -147,9 +145,9 @@ export default function Player({ player, setPlayer }) {
                             minimumValue={0}
                             maximumValue={1}
                             value={calculateSeekBar()}
-                            thumbTintColor="#ffff00"
-                            minimumTrackTintColor="#00ff00"
-                            maximumTrackTintColor="#ff4500"
+                            thumbTintColor={SECONDARY}
+                            minimumTrackTintColor={PRIMARY}
+                            maximumTrackTintColor={PRIMARY}
                             onValueChange={(value) => {
                                 setCurrentPosition(
                                     convertTime(
@@ -174,7 +172,7 @@ export default function Player({ player, setPlayer }) {
                                 setCurrentPosition(0);
                             }}
                         />
-                        <Text fontSize="sm" pt={3}>
+                        <Text fontSize="sm" pt={3} color={WHITE}>
                             {details.currentAudio?.duration}
                         </Text>
                     </Box>
@@ -190,7 +188,7 @@ export default function Player({ player, setPlayer }) {
                                 <Entypo
                                     name="controller-jump-to-start"
                                     size={42}
-                                    color="black"
+                                    color={PRIMARY}
                                 />
                             </TouchableWithoutFeedback>
                             <TouchableWithoutFeedback
@@ -203,14 +201,14 @@ export default function Player({ player, setPlayer }) {
                                         name="controller-paus"
                                         size={42}
                                         style={{ marginHorizontal: 40 }}
-                                        color="black"
+                                        color={PRIMARY}
                                     />
                                 ) : (
                                     <Entypo
                                         name="controller-play"
                                         size={42}
                                         style={{ marginHorizontal: 40 }}
-                                        color="black"
+                                        color={PRIMARY}
                                     />
                                 )}
                             </TouchableWithoutFeedback>
@@ -218,7 +216,7 @@ export default function Player({ player, setPlayer }) {
                                 <Entypo
                                     name="controller-next"
                                     size={42}
-                                    color="black"
+                                    color={PRIMARY}
                                 />
                             </TouchableWithoutFeedback>
                         </Flex>

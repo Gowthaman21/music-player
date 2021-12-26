@@ -186,6 +186,46 @@ const AudioProvider = ({ children }) => {
         }
     };
 
+    const selectMethod = async (meth, uri) => {
+        try {
+            if (uri && meth === "play") {
+                if (details.soundObj === null) {
+                    const status = await play(uri);
+                    handleChange({
+                        soundObj: status,
+                    });
+                    return;
+                } else if (
+                    details.soundObj.isLoaded === true &&
+                    details.soundObj.isPlaying !== true
+                ) {
+                    const status = await playNext(uri);
+                    handleChange({
+                        soundObj: status,
+                    });
+                    return;
+                }
+                return;
+            }
+            if (meth === "pause") {
+                const status = await pause();
+                handleChange({
+                    soundObj: status,
+                });
+                return;
+            }
+            if (meth === "resume") {
+                const status = await resume();
+                handleChange({
+                    soundObj: status,
+                });
+                return;
+            }
+        } catch (error) {
+            console.log("error inside SelectMethod function", error.message);
+        }
+    };
+
     const getFiles = async () => {
         let val = await getPermission();
         if (val.done === true) {
@@ -326,6 +366,7 @@ const AudioProvider = ({ children }) => {
                 details,
                 selectAudio,
                 changeAudio,
+                selectMethod,
                 pause,
                 moveAudio,
                 onPlaybackStatusUpdate,

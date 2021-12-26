@@ -4,13 +4,21 @@ import { Entypo } from "@expo/vector-icons";
 import { TouchableWithoutFeedback, Dimensions } from "react-native";
 import MarqueeText from "react-native-marquee";
 import { AudioContext } from "../context/AudioProvider";
+import {
+    PRIMARY,
+    PRIMARY_VAR,
+    SECONDARY,
+    BACKGROUND,
+    BLACK,
+    WHITE,
+} from "../theme";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 function Text(props) {
     return (
         <MarqueeText
-            style={{ fontSize: 16 }}
+            style={{ fontSize: 16, color: WHITE }}
             duration={1000}
             marqueeOnStart
             loop
@@ -37,7 +45,13 @@ export default function Footer() {
 
     return (
         <NativeBaseProvider>
-            <Box w="full" alignItems="center" flexDirection="row" safeArea>
+            <Box
+                w="full"
+                alignItems="center"
+                flexDirection="row"
+                safeArea
+                bgColor={BACKGROUND}
+            >
                 <Image
                     key={Date.now()}
                     source={{
@@ -56,7 +70,7 @@ export default function Footer() {
                     <Entypo
                         name="controller-jump-to-start"
                         size={42}
-                        color="black"
+                        color={PRIMARY}
                     />
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback
@@ -68,18 +82,18 @@ export default function Footer() {
                         <Entypo
                             name="controller-paus"
                             size={42}
-                            color="black"
+                            color={PRIMARY}
                         />
                     ) : (
                         <Entypo
                             name="controller-play"
                             size={42}
-                            color="black"
+                            color={PRIMARY}
                         />
                     )}
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback onPress={nextSong}>
-                    <Entypo name="controller-next" size={42} color="black" />
+                    <Entypo name="controller-next" size={42} color={PRIMARY} />
                 </TouchableWithoutFeedback>
             </Box>
         </NativeBaseProvider>

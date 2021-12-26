@@ -10,11 +10,16 @@ import {
     HStack,
 } from "native-base";
 import Footer from "./play";
-// import Player from "./player";
 import { AudioContext } from "../context/AudioProvider";
-import GestureRecognizer, {
-    swipeDirections,
-} from "react-native-swipe-gestures";
+import GestureRecognizer from "react-native-swipe-gestures";
+import {
+    PRIMARY,
+    PRIMARY_VAR,
+    SECONDARY,
+    BACKGROUND,
+    BLACK,
+    WHITE,
+} from "../theme";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -57,7 +62,7 @@ function Menu({ show, setShow }) {
     );
 }
 
-export default function Library({ player, setPlayer }) {
+export default function Library({ navigation }) {
     const [showModal, setShowModal] = useState({ show: false, key: "" });
     // const [state, setstate] = useState(initialState)
 
@@ -65,7 +70,7 @@ export default function Library({ player, setPlayer }) {
 
     const onSwipeUp = (gestureState) => {
         console.log("swiped");
-        setPlayer(true);
+        navigation.navigate("player");
         // this.setState({myText: 'You swiped up!'});
     };
     const config = {
@@ -79,8 +84,8 @@ export default function Library({ player, setPlayer }) {
 
     return (
         <NativeBaseProvider>
-            <Box flex={1} safeArea bgColor="white">
-                <Text fontSize="3xl" mx={3} bold>
+            <Box flex={1} safeAreaTop bgColor={BLACK}>
+                <Text fontSize="3xl" mx={3} bold color={PRIMARY}>
                     Library
                 </Text>
                 <Menu show={showModal} setShow={setShowModal} />
@@ -88,9 +93,6 @@ export default function Library({ player, setPlayer }) {
                     data={context.details.audioFiles}
                     renderItem={({ item }) => (
                         <Pressable
-                            onLongPress={() => {
-                                setShowModal({ show: true, key: item.key });
-                            }}
                             onPress={() => {
                                 console.log("item", item.title);
 
@@ -104,9 +106,6 @@ export default function Library({ player, setPlayer }) {
                                 mb="1"
                                 w={windowWidth}
                                 flexDirection="row"
-                                border={2}
-                                borderColor="#707070"
-                                borderBottomWidth={2}
                             >
                                 <Image
                                     source={{
@@ -117,10 +116,10 @@ export default function Library({ player, setPlayer }) {
                                     fallbackSource="https://st.depositphotos.com/3538103/5169/i/950/depositphotos_51692599-stock-photo-music-icon-design.jpg"
                                 />
                                 <Box px="5">
-                                    <Text fontSize={"lg"} bold>
+                                    <Text fontSize={"lg"} bold color={WHITE}>
                                         {item.title}
                                     </Text>
-                                    <Text>{item.artist}</Text>
+                                    <Text color={WHITE}>{item.artist}</Text>
                                 </Box>
                             </Box>
                         </Pressable>
