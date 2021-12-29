@@ -13,9 +13,8 @@ import {
     BLACK,
     WHITE,
 } from "../theme";
+import { windowWidth,windowHeight } from "./home";
 
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
 
 export default function Player({ navigation }) {
     const [currentPosition, setCurrentPosition] = useState(0);
@@ -31,7 +30,6 @@ export default function Player({ navigation }) {
     const onSwipeDown = (gestureState) => {
         console.log("swiped down");
         navigation.navigate("library");
-        // this.setState({myText: 'You swiped up!'});
     };
 
     const calculateSeekBar = () => {
@@ -108,7 +106,6 @@ export default function Player({ navigation }) {
                     flex={1}
                     alignItems="center"
                     bgColor={BLACK}
-                    // justifyContent="center"
                     width={windowWidth}
                     height={windowHeight}
                 >
@@ -221,11 +218,6 @@ export default function Player({ navigation }) {
                             </TouchableWithoutFeedback>
                         </Flex>
                     </View>
-                    {/* <View>
-                    <Text fontSize="xs">Up Next</Text>
-                    <Text fontSize="md">{upNext.title}</Text>
-                    <Text fontSize="xs">{upNext.artist}</Text>
-                </View> */}
                 </Box>
             </GestureRecognizer>
         </NativeBaseProvider>

@@ -70,8 +70,10 @@ export default function ChatScreen({ route, navigation }) {
                 await selectMethod("resume");
             } else if (text.startsWith("Playing")) {
                 let eg = text.substring(8);
-                let uri = await getLink(eg[1]);
+                let uri = await getLink(eg);
                 await selectMethod("play", uri);
+            } else if (text === "Stoping") {
+                await selectMethod("stop");
             }
         }
     };
@@ -119,7 +121,6 @@ export default function ChatScreen({ route, navigation }) {
 
     const leave = () => {
         navigation.navigate("home");
-        console.log("leave");
     };
 
     const onSend = useCallback(async (messages = []) => {
@@ -142,6 +143,8 @@ export default function ChatScreen({ route, navigation }) {
         } else if (text.startsWith("/p")) {
             console.log("mes", messages);
             await slashPlay(messages);
+        } else if (text === "/stop") {
+            await slashStop(messages);
         } else if (text === "/leave") {
             leave();
         }

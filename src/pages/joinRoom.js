@@ -7,13 +7,10 @@ import {
     Button,
     Box,
     Text,
-    HStack,
 } from "native-base";
 import React, { useState } from "react";
 import {
     PRIMARY,
-    PRIMARY_VAR,
-    SECONDARY,
     BACKGROUND,
     BLACK,
     WHITE,
@@ -52,7 +49,10 @@ const JoinRoom = ({ navigation }) => {
                                 borderWidth={"2"}
                                 fontSize="md"
                                 fontWeight="bold"
-                                style={{ color: WHITE }}
+                                style={{
+                                    color: WHITE,
+                                    backgroundColor: BACKGROUND,
+                                }}
                             />
                         </FormControl>
                         <FormControl>
@@ -68,7 +68,10 @@ const JoinRoom = ({ navigation }) => {
                                 borderWidth={"2"}
                                 fontSize="md"
                                 fontWeight="bold"
-                                style={{ color: WHITE }}
+                                style={{
+                                    color: WHITE,
+                                    backgroundColor: BACKGROUND,
+                                }}
                             />
                         </FormControl>
                         <Button

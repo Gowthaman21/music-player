@@ -4,11 +4,6 @@ import { Audio } from "expo-av";
 export const AudioContext = createContext();
 
 const AudioProvider = ({ children }) => {
-    const [playList, setplayList] = useState([]);
-    const [addToPlayList, setaddToPlayList] = useState(null);
-    const [isPlayListRunning, setisPlayListRunning] = useState(false);
-    const [activePlayList, setactivePlayList] = useState([]);
-
     const [details, setDetails] = useState({
         audioFiles: [],
         playbackObj: null,
@@ -32,14 +27,11 @@ const AudioProvider = ({ children }) => {
     }, []);
 
     const onPlaybackStatusUpdate = async (playbackStatus) => {
-        // console.log("currentIndex", playbackStatus.uri);
         if (playbackStatus.isLoaded && playbackStatus.isPlaying) {
             handleChange({
                 playbackPosition: playbackStatus.positionMillis,
                 playbackDuration: playbackStatus.durationMillis,
             });
-            // setplaybackPosition(playbackStatus.positionMillis);
-            // setplaybackDuration(playbackStatus.durationMillis);
         }
         if (playbackStatus.didJustFinish) {
             handleChange({ isPlaying: false });
@@ -48,14 +40,11 @@ const AudioProvider = ({ children }) => {
 
     const play = async (uri, lastPosition) => {
         try {
-            console.log("uri", uri);
-
             if (!lastPosition)
                 return await details.playbackObj.loadAsync(
                     { uri },
                     { shouldPlay: true, progressUpdateIntervalMillis: 1000 }
                 );
-
             // but if there is lastPosition then we will play audio from the lastPosition
             await details.playbackObj.loadAsync(
                 { uri },
@@ -102,20 +91,11 @@ const AudioProvider = ({ children }) => {
 
     const selectAudio = async (key) => {
         try {
-            console.log("key", key);
-
             let det = details.audioFiles.find((i) => i.key === key.toString());
-            console.log("song", det.audioUrl);
 
             if (details.soundObj === null) {
                 // playing for first time
-                console.log("hhhh", det.audioUrl);
                 const status = await play(det.audioUrl);
-
-                // setcurrentAudio(det);
-                // setcurrentAudioIndex(det.key);
-                // setsoundObj(status);
-                // setisPlaying(true);
                 await handleChange({
                     currentAudio: det,
                     currentAudioIndex: det.key,
@@ -135,9 +115,6 @@ const AudioProvider = ({ children }) => {
                 details.currentAudioIndex === det.key
             ) {
                 const status = await pause();
-                // setsoundObj(status);
-                // setisPlaying(false);
-                // setplaybackPosition(status.positionMillis);
                 handleChange({
                     currentAudio: det,
                     currentAudioIndex: det.key,
@@ -153,8 +130,6 @@ const AudioProvider = ({ children }) => {
                 details.currentAudioIndex === det.key
             ) {
                 const status = await resume();
-                // setsoundObj(status);
-                // setisPlaying(true);
                 handleChange({
                     soundObj: status,
                     isPlaying: true,
@@ -168,7 +143,6 @@ const AudioProvider = ({ children }) => {
             ) {
                 //select another file
                 const status = await playNext(det.audioUrl);
-                console.log("status", status);
                 handleChange({
                     currentAudio: det,
                     currentAudioIndex: det.key,
@@ -176,10 +150,6 @@ const AudioProvider = ({ children }) => {
                     isPlaying: true,
                 });
                 return;
-                // setcurrentAudio(det);
-                // setcurrentAudioIndex(det.key);
-                // setsoundObj(status);
-                // setisPlaying(true);
             }
         } catch (error) {
             console.log("error inside select audio method.", error.message);
@@ -191,15 +161,6 @@ const AudioProvider = ({ children }) => {
             if (uri && meth === "play") {
                 if (details.soundObj === null) {
                     const status = await play(uri);
-                    handleChange({
-                        soundObj: status,
-                    });
-                    return;
-                } else if (
-                    details.soundObj.isLoaded === true &&
-                    details.soundObj.isPlaying !== true
-                ) {
-                    const status = await playNext(uri);
                     handleChange({
                         soundObj: status,
                     });
@@ -221,6 +182,13 @@ const AudioProvider = ({ children }) => {
                 });
                 return;
             }
+            if (meth === "stop") {
+                await details.playbackObj.stopAsync();
+                await details.playbackObj.unloadAsync();
+                handleChange({
+                    soundObj: null,
+                });
+            }
         } catch (error) {
             console.log("error inside SelectMethod function", error.message);
         }
@@ -229,14 +197,11 @@ const AudioProvider = ({ children }) => {
     const getFiles = async () => {
         let val = await getPermission();
         if (val.done === true) {
-            // setplaybackObj(new Audio.Sound());
-            // setaudioFiles(val.final);
             handleChange({
                 playbackObj: new Audio.Sound(),
                 audioFiles: val.final,
             });
         }
-        // setaudioFiles(await getPermission());
     };
 
     const changeAudio = async (select) => {
@@ -317,12 +282,6 @@ const AudioProvider = ({ children }) => {
                 playbackPosition: null,
                 playbackDuration: null,
             });
-            // setcurrentAudio(audio);
-            // setsoundObj(status);
-            // setisPlaying(true);
-            // setcurrentAudioIndex(index);
-            // setplaybackPosition(null);
-            // setplaybackDuration(null);
         } catch (error) {
             console.log("error inside change audio method.", error.message);
         }
@@ -335,8 +294,6 @@ const AudioProvider = ({ children }) => {
             const status = await details.playbackObj.setPositionAsync(
                 Math.floor(details.soundObj.durationMillis * value)
             );
-            // setsoundObj(status);
-            // setplaybackPosition(status.positionMillis);
             handleChange({
                 soundObj: status,
                 playbackPosition: status.positionMillis,
@@ -349,20 +306,12 @@ const AudioProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        // settotalAudioCount(audioFiles.length);
-        // details.audioFiles.map((i) => {
-        //     console.log("file", i.key, i.title, i.audioUrl);
-        // });
         handleChange({ totalAudioCount: details.audioFiles.length });
     }, [details.audioFiles]);
 
     return (
         <AudioContext.Provider
             value={{
-                playList,
-                addToPlayList,
-                isPlayListRunning,
-                activePlayList,
                 details,
                 selectAudio,
                 changeAudio,

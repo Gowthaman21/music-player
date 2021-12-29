@@ -12,9 +12,8 @@ import {
     BLACK,
     WHITE,
 } from "../theme";
+import { windowWidth } from "./home";
 
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
 function Text(props) {
     return (
         <MarqueeText

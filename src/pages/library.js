@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { FlatList, Dimensions } from "react-native";
 import {
     NativeBaseProvider,
@@ -20,14 +20,11 @@ import {
     BLACK,
     WHITE,
 } from "../theme";
-
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
+import { windowWidth } from "./home";
 
 function Options(props) {
     return (
         <Box
-            // bgColor="yellow.100"
             w="full"
             px={2}
             py={1}
@@ -64,23 +61,16 @@ function Menu({ show, setShow }) {
 
 export default function Library({ navigation }) {
     const [showModal, setShowModal] = useState({ show: false, key: "" });
-    // const [state, setstate] = useState(initialState)
 
     const context = useContext(AudioContext);
 
     const onSwipeUp = (gestureState) => {
-        console.log("swiped");
         navigation.navigate("player");
-        // this.setState({myText: 'You swiped up!'});
     };
     const config = {
         velocityThreshold: 0.3,
         directionalOffsetThreshold: 80,
     };
-
-    // useEffect(() => {
-    //     console.log("keywss", data[0]?.duration);
-    // }, [key]);
 
     return (
         <NativeBaseProvider>
@@ -97,8 +87,6 @@ export default function Library({ navigation }) {
                                 console.log("item", item.title);
 
                                 context.selectAudio(item.key);
-                                // setKey(item.key);
-                                // setSongQueued(true);
                             }}
                         >
                             <Box
